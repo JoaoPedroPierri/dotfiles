@@ -1,0 +1,91 @@
+// Waybar - substitui a polybar (barra de cima + barra de baixo)
+[
+  {
+    "name": "top",
+    "layer": "top",
+    "position": "top",
+    "height": 24,
+    "modules-left": [],
+    "modules-center": ["battery", "cpu", "memory"],
+    "modules-right": ["pulseaudio", "clock", "custom/nightlight", "custom/power"],
+
+    "battery": {
+      "format": "{icon} {capacity}%",
+      "format-charging": "\uf0e7 {capacity}%",
+      "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+      "states": { "warning": 25, "critical": 10 }
+    },
+    "cpu": {
+      "interval": 2,
+      "format": "\uf2db  {usage}%"
+    },
+    "memory": {
+      "interval": 2,
+      "format": "\uf538  {percentage}%"
+    },
+    "pulseaudio": {
+      "format": "\uf028  {volume}%",
+      "format-muted": "\uf026  Sem som",
+      "on-click": "pavucontrol",
+      "scroll-step": 5
+    },
+    "clock": {
+      "interval": 30,
+      "format": "\uf017  {:%a %d/%m/%y  %H:%M}",
+      "tooltip-format": "<tt>{calendar}</tt>"
+    },
+    "custom/nightlight": {
+      "exec": "nightlight status",
+      "interval": 5,
+      "on-click": "nightlight"
+    },
+    "custom/power": {
+      "format": "\uf011",
+      "tooltip": false,
+      "on-click": "powermenu"
+    }
+  },
+  {
+    "name": "bottom",
+    "layer": "top",
+    "position": "bottom",
+    "height": 24,
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["hyprland/window"],
+    "modules-right": ["hyprland/language", "custom/updates", "tray"],
+
+    "hyprland/workspaces": {
+      "format": "{icon}",
+      "persistent-workspaces": { "*": 8 },
+      "format-icons": {
+        "1": "\uf268",
+        "2": "\uf120",
+        "3": "\uf2c6",
+        "4": "\uf001",
+        "5": "\uf15c",
+        "6": "\uf03d",
+        "7": "\uf019",
+        "8": "\uf121",
+        "default": "\uf111"
+      }
+    },
+    "hyprland/window": {
+      "max-length": 60,
+      "separate-outputs": true,
+      "format": "{title}"
+    },
+    "hyprland/language": {
+      "format": "\uf11c  {short}"
+    },
+    "custom/updates": {
+      "exec": "checkupdates 2>/dev/null | wc -l",
+      "interval": 600,
+      "format": "\uf021  {}",
+      "on-click": "kitty -e sudo pacman -Syu"
+    },
+    "tray": {
+      "icon-size": 14,
+      "spacing": 8
+    }
+  }
+]

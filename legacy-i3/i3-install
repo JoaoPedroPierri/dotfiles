@@ -1,0 +1,160 @@
+#!/bin/env bash
+
+# Usernam: Franklin Souza
+# Telegram: @FranklinTech
+
+clear
+[ ! `command -v git` ] && echo "Git não instalado, por favor faça a instalação" && exit 1
+
+# License: GPL v3.0
+# Install config i3 script
+
+# Criando diretórios
+mkdir $HOME/.joao-repo
+mkdir $HOME/.compile
+mkdir $HOME/.config/rofi
+mkdir $HOME/.config/rofi/themes
+mkdir $HOME/.config/redshift
+mkdir $HOME/.config/polybar
+mkdir $HOME/.config/dunst
+mkdir $HOME/.config/nvim
+mkdir $HOME/.fonts
+mkdir $HOME/.themes
+mkdir $HOME/.Lock
+mkdir $HOME/.icons
+mkdir $HOME/.local/bin
+mkdir $HOME/scripts
+mkdir $HOME/wallpapers
+
+# Aviso
+clear && printf "ATENÇÃO: LEIA O SCRIPT ANTES DE EXECUTA-LO!!!\n"
+printf "Deseja executar o script?\n\n[1] - Sim\n[2] - Não\n\n"
+read EXECUTE
+
+if [ $EXECUTE == '1' ];then
+  continue
+else
+  printf "Saindo..." && exit 0
+fi
+
+clear && printf "
+██╗██████╗       ██╗███╗   ██╗███████╗████████╗ █████╗ ██╗     ██╗     
+██║╚════██╗      ██║████╗  ██║██╔════╝╚══██╔══╝██╔══██╗██║     ██║     
+██║ █████╔╝█████╗██║██╔██╗ ██║███████╗   ██║   ███████║██║     ██║     
+██║ ╚═══██╗╚════╝██║██║╚██╗██║╚════██║   ██║   ██╔══██║██║     ██║     
+██║██████╔╝      ██║██║ ╚████║███████║   ██║   ██║  ██║███████╗███████╗
+╚═╝╚═════╝       ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝\n\n"
+
+# Baixando pacotes
+clear && sudo pacman -S archlinux-keyring --noconfirm
+sudo pacman -S python-pip xclip arandr pacman-contrib  blueman maim dunst libnotify playerctl gvfs-mtp xdg-user-dirs usbutils w3m lib32-dbus-glib base-devel imagemagick python-pywal aria2 mpv fortune-mod maim pavucontrol qbittorrent pulseaudio-alsa jq zsh-autosuggestions zsh-syntax-highlighting redshift lsd youtube-dl android-tools gucharmap viewnior brightnessctl libreoffice zip unzip numlockx fzf ueberzug cups hplip system-config-printer simplescreenrecorder i3lock yt-dlp --noconfirm && xdg-user-dirs-update
+
+# Compilações
+# Compilando -> Polybar
+cd $HOME/.compile
+git clone https://aur.archlinux.org/polybar.git
+cd $HOME/.compile/polybar
+makepkg -sic --noconfirm
+
+# Compilando -> Autotiling
+cd $HOME/.compile
+git clone https://aur.archlinux.org/autotiling.git
+cd $HOME/.compile/autotiling
+makepkg -sic --noconfirm
+
+# Compilando -> Pulseaudio-ctl
+cd $HOME/.compile
+git clone https://aur.archlinux.org/pulseaudio-ctl.git
+cd $HOME/.compile/pulseaudio-ctl
+makepkg -sic --noconfirm
+
+# Compilando -> Google Chrome
+cd $HOME/.compile
+git clone https://aur.archlinux.org/google-chrome.git
+cd $HOME/.compile/google-chrome
+makepkg -sic --noconfirm
+
+# Limpar console
+clear
+
+# Clonando meu repositório
+cd $HOME/.joao-repo
+git clone https://github.com/JoaoPedroPierri/dotfiles.git
+
+# i3Lock
+cd $HOME/.Lock
+cp -r $HOME/.joao-repo/dotfiles/lock/ArchLinux.png ~/.Lock
+
+# dir ~/.local/bin e dando permissões aos scripts
+cp $HOME/.joao-repo/dotfiles/bin/* $HOME/.local/bin
+cd $HOME/.local/bin && chmod +x *
+
+# dir ~/Scripts e dando permissões aos scripts
+cp $HOME/.joao-repo/dotfiles/scripts/* $HOME/scripts
+cd $HOME/scripts && chmod +x *
+
+# Copiando as fontes para o sistema
+cp $HOME/.joao-repo/dotfiles/.fonts/* $HOME/.fonts
+sudo cp $HOME/.joao-repo/dotfiles/.fonts/Iosevka-Medium.ttf /usr/share/fonts/TTF
+sudo cp $HOME/.joao-repo/dotfiles/.fonts/Iosevka-Bold.ttf /usr/share/fonts/TTF
+
+# Copiando files zsh
+cp ~/.joao-repo/dotfiles/.zshrc $HOME
+cp ~/.joao-repo/dotfiles/.zshenv $HOME
+cp ~/.joao-repo/dotfiles/.zprofile $HOME
+cp ~/.joao-repo/dotfiles/.aliases $HOME
+cp ~/.joao-repo/dotfiles/.xprofile $HOME
+touch .zhistory $HOME
+sudo mkdir /usr/share/zsh/plugins
+sudo pacman -S zsh-autosuggestions && sudo pacman -S zsh-syntax-highlighting
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Aplicando tema - i3wm
+cp $HOME/.joao-repo/dotfiles/.config/i3/config $HOME/.config/i3/
+
+# YTFZF - CONFIG
+cp -r ~/.joao-repo/dotfiles/.config/ytfzf $HOME/.config/
+
+# Polybar
+cp -r $HOME/.joao-repo/dotfiles/.config/polybar/scripts $HOME/.config/polybar
+cp $HOME/.joao-repo/dotfiles/.config/polybar/config $HOME/.config/polybar
+chmod +x $HOME/.config/polybar/scripts/*
+
+# Rofi
+sudo pacman -S rofi --noconfirm
+cp $HOME/.joao-repo/dotfiles/.config/rofi/drun.rasi $HOME/.config/rofi/
+cp $HOME/.joao-repo/dotfiles/.config/rofi/dark.rasi $HOME/.config/rofi/themes/
+
+# Kitty
+cp $HOME/.joao-repo/dotfiles/.config/kitty/kitty.conf $HOME/.config/kitty
+cp $HOME/.joao-repo/dotfiles/.config/kitty/theme.conf $HOME/.config/kitty
+sudo ln -sv /usr/bin/kitty /usr/bin/xterm
+
+# DUNST
+cp $HOME/.joao-repo/dotfiles/.config/dunst/dunstrc $HOME/.config/dunst
+
+# NITROGEN
+sudo pacman -S nitrogen --noconfirm
+cd $HOME/wallpapers
+cp $HOME/.joao-repo/dotfiles/wallpapers/* $HOME/wallpapers
+nitrogen --set-auto $HOME/wallpapers/8.jpg
+
+# NEOVIM
+cp $HOME/.joao-repo/dotfiles/.config/nvim/init.vim $HOME/.config/nvim
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+# YAY
+cd && git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si && cd && sudo rm -rf yay-bin
+yay -S tidal-hifi-bin
+
+# Instalando as fontes:
+sudo pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-nerd-fonts-symbols-mono ttf-jetbrains-mono noto-fonts-extra ttf-nerd-fonts-symbols-mono ttf-font-awesome ttf-fantasque-sans-mono ttf-fira-code ttf-joypixels --noconfirm
+
+# Extras
+cd /usr/share/applications
+sudo rm -rf  avahi-discover.desktop bssh.desktop bvnc.desktop mimeinfo.cache lstopo.desktop qv4l2.desktop qvidcap.desktop
+mv ~/.joao-repo/dotfiles/scripts ~/.config/redshift/
+
+# Restart i3
+i3-msg restart

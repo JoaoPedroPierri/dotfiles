@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Luz noturna (hyprsunset). Substitui o redshift, que não funciona em Wayland.
+# Uso:  nightlight          -> liga/desliga (2700K)
+#       nightlight 3500     -> liga com outra temperatura
+#       nightlight status   -> texto para a Waybar
+
+if [ "$1" = "status" ]; then
+  if pgrep -x hyprsunset >/dev/null; then
+    printf '\uf186  ON\n'
+  else
+    printf '\uf185\n'
+  fi
+  exit 0
+fi
+
+if pgrep -x hyprsunset >/dev/null; then
+  pkill -x hyprsunset
+else
+  hyprsunset -t "${1:-2700}" >/dev/null 2>&1 &
+fi

@@ -1,0 +1,24 @@
+* {
+  font-family: "Iosevka", "JetBrainsMono Nerd Font", monospace;
+  font-size: 14px;
+}
+
+window {
+  background-color: #191919;
+  border: 2px solid #191919;
+}
+
+#input {
+  margin: 6px;
+  padding: 6px;
+  color: #ffffff;
+  background-color: #191919;
+  border: none;
+  border-bottom: 1px solid #ffffff;
+}
+
+#inner-box, #outer-box, #scroll { background-color: #191919; }
+
+#entry { padding: 4px 8px; color: #ffffff; }
+#entry:selected { background-color: #ffffff; color: #000000; }
+#text:selected { color: #000000; }

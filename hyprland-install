@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+
+# Hyprland dotfiles install (substitui o antigo i3-install)
+# João Pedro Pierri (@joaoppierri)
+# Corre como utilizador normal (NÃO como root), já dentro do Hyprland ou de um tty,
+# depois de teres instalado o Arch com install/arch-install.sh.
+
+set -euo pipefail
+
+REPO_URL="https://github.com/JoaoPedroPierri/dotfiles.git"
+REPO_DIR="$HOME/.joao-repo/dotfiles"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+
+msg(){ printf '\n\e[1;36m[!] %s\e[0m\n' "$*"; }
+
+[[ $EUID -ne 0 ]] || { echo "Não corras isto como root."; exit 1; }
+command -v git >/dev/null || { echo "Instala o git primeiro: sudo pacman -S git"; exit 1; }
+ping -c1 -W3 archlinux.org &>/dev/null || { echo "Sem internet (usa: nmtui)."; exit 1; }
+
+clear
+printf "ATENÇÃO: LEIA O SCRIPT ANTES DE EXECUTÁ-LO!!!\n"
+printf "As configs existentes serão guardadas como <nome>.bak-%s\n\n" "$STAMP"
+read -rp "Deseja continuar? [s/N]: " r
+[[ ${r,,} == s ]] || { echo "Saindo..."; exit 0; }
+
+# ---------------- pastas ----------------
+msg "A criar pastas"
+mkdir -p "$HOME"/{.joao-repo,.compile,.fonts,.themes,.icons,.Lock,wallpapers} \
+         "$HOME/.local/bin" "$HOME/.config"
+
+# ---------------- pacotes oficiais ----------------
+msg "A instalar pacotes"
+sudo pacman -Syu --needed --noconfirm \
+  hyprland hyprlock hypridle hyprsunset hyprpolkitagent \
+  xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
+  waybar wofi dunst kitty swaybg \
+  grim slurp wl-clipboard wf-recorder \
+  python-pywal imagemagick fortune-mod \
+  pipewire pipewire-alsa pipewire-pulse wireplumber pavucontrol playerctl \
+  brightnessctl libnotify xdg-user-dirs pacman-contrib \
+  blueman network-manager-applet gvfs-mtp usbutils w3m aria2 jq fzf lsd \
+  zsh zsh-autosuggestions zsh-syntax-highlighting \
+  mpv yt-dlp qbittorrent viewnior gucharmap libreoffice-fresh \
+  android-tools cups hplip system-config-printer zip unzip \
+  noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra \
+  ttf-jetbrains-mono-nerd ttf-font-awesome ttf-fira-code ttf-fantasque-sans-mono
+xdg-user-dirs-update
+
+# ---------------- yay + AUR ----------------
+if ! command -v yay >/dev/null; then
+  msg "A instalar o yay"
+  rm -rf "$HOME/.compile/yay-bin"
+  git clone https://aur.archlinux.org/yay-bin.git "$HOME/.compile/yay-bin"
+  (cd "$HOME/.compile/yay-bin" && makepkg -si --noconfirm)
+fi
+msg "A instalar pacotes do AUR (Google Chrome, Tidal)"
+yay -S --needed --noconfirm google-chrome tidal-hifi-bin
+
+# ---------------- repositório ----------------
+msg "A obter os dotfiles"
+if [[ -d $REPO_DIR/.git ]]; then
+  git -C "$REPO_DIR" pull --ff-only
+else
+  git clone "$REPO_URL" "$REPO_DIR"
+fi
+
+# copia ficheiro/pasta com backup do que já existir
+put(){
+  local src="$1" dst="$2"
+  [[ -e $dst || -L $dst ]] && mv "$dst" "$dst.bak-$STAMP"
+  mkdir -p "$(dirname "$dst")"
+  cp -a "$src" "$dst"
+}
+
+# ---------------- oh-my-zsh (sem tocar no .zshrc, sem mudar de shell ainda) ----------------
+if [[ ! -d $HOME/.oh-my-zsh ]]; then
+  msg "A instalar o oh-my-zsh"
+  RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
+msg "A copiar configurações"
+for f in .zshrc .zshenv .zprofile .aliases; do put "$REPO_DIR/$f" "$HOME/$f"; done
+touch "$HOME/.zhistory"
+
+for d in hypr waybar wofi kitty dunst nvim ytfzf neofetch; do
+  put "$REPO_DIR/.config/$d" "$HOME/.config/$d"
+done
+put "$REPO_DIR/.config/chrome-flags.conf" "$HOME/.config/chrome-flags.conf"
+
+# scripts, fontes, wallpapers, lockscreen
+cp -a "$REPO_DIR"/bin/* "$HOME/.local/bin/" && chmod +x "$HOME"/.local/bin/*
+cp -a "$REPO_DIR"/.fonts/* "$HOME/.fonts/" && fc-cache -f
+cp -a "$REPO_DIR"/wallpapers/* "$HOME/wallpapers/"
+cp -a "$REPO_DIR"/lock/ArchLinux.png "$HOME/.Lock/"
+
+# ---------------- cores (pywal) + wallpaper ----------------
+msg "A gerar cores e wallpaper"
+"$HOME/.local/bin/wallpaper" "$HOME/wallpapers/8.jpg" || true
+
+# ---------------- neovim (vim-plug) ----------------
+"$HOME/.local/bin/vimplug" || true
+
+# ---------------- extras ----------------
+sudo rm -f /usr/share/applications/{avahi-discover,bssh,bvnc,lstopo,qv4l2,qvidcap}.desktop
+
+read -rp "Instalar GPU AMD completa + Wine/jogos (gpu.sh)? [s/N]: " g
+[[ ${g,,} == s ]] && bash "$REPO_DIR/gpu.sh"
+
+read -rp "Mudar o shell para zsh? [S/n]: " z
+[[ ${z,,} == n ]] || chsh -s /bin/zsh
+
+msg "Concluído! Termina a sessão e volta a entrar (ou corre: hyprctl reload)."

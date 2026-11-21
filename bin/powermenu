@@ -1,0 +1,11 @@
+#!/bin/sh
+# Menu de energia (substitui o módulo powermenu da polybar)
+choice="$(printf 'Bloquear\nSair\nSuspender\nReiniciar\nDesligar\n' | wofi --dmenu --prompt 'Energia' --width 260 --height 230)"
+
+case "$choice" in
+  Bloquear)  hyprlock ;;
+  Sair)      loginctl terminate-user "$USER" ;;
+  Suspender) systemctl suspend ;;
+  Reiniciar) systemctl reboot ;;
+  Desligar)  systemctl poweroff ;;
+esac

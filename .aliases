@@ -1,0 +1,33 @@
+  # My aliases
+
+# COMPUTADOR
+  alias up='sudo pacman -Syu --noconfirm'
+  alias up2='sudo pacman -Syy --noconfirm'
+  alias ya='yay -Syua'
+  alias del='sudo pacman -Scc --noconfirm'
+  alias dep='sudo pacman -Rs $(sudo pacman -Qtdq)'
+  alias help='cat ~/.aliases'
+  alias hypr='nvim ~/.config/hypr/hyprland.lua'
+  alias bar='nvim ~/.config/waybar/config.jsonc'
+  alias scri='cd ~/.local/bin/'
+  alias hcl='hyprctl reload'
+  alias lixo='cd .local/share/Trash/files'
+
+
+# GITHUB
+  alias repo='cd ~/.joao-repo/dotfiles/'
+  alias plugins='cd ~/.joao-repo/joao-plugins/'
+  alias gp='git pull'
+  alias gc='git clone'
+  alias gh='git push origin master'
+  alias ga='git add'
+  alias login='git remote set-url origin git@github.com:JoaoPedroPierri/dotfiles.git'
+
+# CELULAR
+  alias reb='adb reboot'
+  alias boot='adb reboot bootloader'
+
+# SSH
+
+  alias ubuntu='ssh ubuntu@140.238.184.242'
+

@@ -1,0 +1,57 @@
+#!/bin/sh
+# Screenshots no Wayland (grim + slurp + wl-clipboard)
+# Uso:  shot -s -r  (guardar ecrã)   shot -s -a  (guardar área)
+#       shot -c -r  (copiar ecrã)    shot -c -a  (copiar área)
+#       shot -u -r  (upload 0x0.st)  shot -u -a  (upload da área)
+
+NOW="$(date +"%Y-%m-%d_%H-%M-%S")"
+DIR="$HOME/Imagens"
+FILE="$DIR/$NOW.png"
+TMP="/tmp/$NOW.png"
+mkdir -p "$DIR"
+
+area() { slurp; }
+
+sr() {
+  grim "$FILE"
+  notify-send -u low -i "$FILE" "PrintScreen" "Salvo em $FILE"
+}
+
+sa() {
+  g="$(area)" || exit 0
+  grim -g "$g" "$FILE"
+  notify-send -u low -i "$FILE" "PrintScreen" "Área selecionada salva em $FILE"
+}
+
+cr() {
+  grim "$TMP"
+  wl-copy --type image/png < "$TMP"
+  notify-send -u low -i "$TMP" "PrintScreen" "Copiado para o clipboard"
+}
+
+ca() {
+  g="$(area)" || exit 0
+  grim -g "$g" "$TMP"
+  wl-copy --type image/png < "$TMP"
+  notify-send -u low -i "$TMP" "PrintScreen" "Área selecionada copiada para o clipboard"
+}
+
+ur() {
+  grim "$TMP"
+  printf '%s' "$(curl -s -F file=@"$TMP" https://0x0.st)" | wl-copy
+  notify-send -u low -i "$TMP" "PrintScreen" "URL do upload no clipboard"
+}
+
+ua() {
+  g="$(area)" || exit 0
+  grim -g "$g" "$TMP"
+  printf '%s' "$(curl -s -F file=@"$TMP" https://0x0.st)" | wl-copy
+  notify-send -u low -i "$TMP" "PrintScreen" "URL do upload da área no clipboard"
+}
+
+fun="$(echo "$@" | sed 's/-//g;s/ //g')"
+
+case "$fun" in
+  sr|sa|cr|ca|ur|ua) "$fun" ;;
+  *) echo "Uso: shot [-s|-c|-u] [-r|-a]"; exit 1 ;;
+esac

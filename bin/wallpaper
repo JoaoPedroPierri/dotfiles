@@ -1,0 +1,28 @@
+#!/bin/sh
+# Define o wallpaper (swaybg) e gera as cores (pywal).
+# Uso:  wallpaper /caminho/imagem.jpg   -> muda e lembra a escolha
+#       wallpaper                       -> repõe o último (usado no arranque)
+
+STATE="$HOME/.cache/current-wallpaper"
+DEFAULT="$HOME/wallpapers/8.jpg"
+
+if [ -n "$1" ]; then
+  IMG="$(realpath "$1")" || exit 1
+  mkdir -p "$(dirname "$STATE")"
+  printf '%s\n' "$IMG" > "$STATE"
+  NEW=1
+else
+  [ -f "$STATE" ] && IMG="$(cat "$STATE")" || IMG="$DEFAULT"
+  NEW=0
+fi
+
+[ -f "$IMG" ] || { echo "Imagem não encontrada: $IMG"; exit 1; }
+
+command -v wal >/dev/null 2>&1 && wal -n -q -i "$IMG"
+
+pkill -x swaybg 2>/dev/null
+swaybg -m fill -i "$IMG" >/dev/null 2>&1 &
+
+# Só recarrega o Hyprland quando mudas de wallpaper (para atualizar as cores das bordas)
+[ "$NEW" = 1 ] && hyprctl reload >/dev/null 2>&1
+exit 0
