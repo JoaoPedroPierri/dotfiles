@@ -65,14 +65,10 @@ grub-mkconfig -o /boot/grub/grub.cfg
 systemctl enable NetworkManager sddm
 ```
 ---
-Notas
-Hyprland 0.55+ usa configuração em Lua (`~/.config/hypr/hyprland.lua`). O formato antigo `hyprland.conf` está descontinuado. Se o teu Hyprland for mais antigo que a 0.55, usa o Hyprland da versão do teu sistema ou atualiza (`sudo pacman -Syu`). O `hypridle.conf` e o `hyprlock.conf` mantêm o formato antigo.
-Se o teclado ficar diferente já no Hyprland, confirma em `~/.config/hypr/hyprland.lua` a linha `kb_layout = "pt"`.
-Se usares teclado brasileiro, troca `pt-latin1` → `br-abnt2` e `kb_layout = "pt"` → `kb_layout = "br"`, e o locale para `pt_BR`.
-Wine/jogos: `~/.joao-repo/dotfiles/gpu.sh`.
----
 Comandos e atalhos para utilizar
 Estes são os comandos e atalhos principais configurados para controlar o ambiente no Hyprland:
+---
+
 Atalho	Ação
 `SUPER + Enter`	terminal
 `SUPER + D`	lançador
