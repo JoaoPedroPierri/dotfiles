@@ -69,7 +69,7 @@ Comandos e atalhos para utilizar
 Estes são os comandos e atalhos principais configurados para controlar o ambiente no Hyprland:
 ---
 
-Atalho	Ação
+`Atalho	Ação
 `SUPER + Enter`	terminal
 `SUPER + D`	lançador
 `SUPER + Q`	fechar janela
@@ -77,5 +77,5 @@ Atalho	Ação
 `SUPER + L`	bloquear
 `SUPER + 1..5`	mudar de área de trabalho
 `Print`	captura de ecrã
-> **Nota:** O `SUPER + M` sai do Hyprland.
-FINALIZADO
+> **Nota:** O SUPER + M sai do Hyprland.
+FINALIZADO´
